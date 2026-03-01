@@ -1,15 +1,19 @@
 import { useTrackerStore } from '@/store/trackerStore';
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Dumbbell, BookOpen, Briefcase, TrendingUp, Target, Clock } from 'lucide-react';
+import { Dumbbell, BookOpen, Briefcase, TrendingUp, Target, Clock, ChevronRight } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { format, subDays } from 'date-fns';
+import type { TrackerTab } from '@/types/tracker';
 
-const StatCard = ({ icon, label, value, sub, color }: { icon: React.ReactNode; label: string; value: string; sub?: string; color?: string }) => (
-  <motion.div
+const StatCard = ({ icon, label, value, sub, color, onTap }: { icon: React.ReactNode; label: string; value: string; sub?: string; color?: string; onTap?: () => void }) => (
+  <motion.button
+    onClick={onTap}
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
-    className="glass-card stat-glow rounded-lg p-4"
+    whileHover={{ scale: 1.03, y: -2 }}
+    whileTap={{ scale: 0.97 }}
+    className="glass-card stat-glow rounded-lg p-4 text-left w-full group cursor-pointer"
   >
     <div className="flex items-start justify-between">
       <div>
@@ -17,9 +21,12 @@ const StatCard = ({ icon, label, value, sub, color }: { icon: React.ReactNode; l
         <p className={`font-mono text-2xl font-bold mt-1 ${color || 'text-foreground'}`}>{value}</p>
         {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
       </div>
-      <div className="text-muted-foreground">{icon}</div>
+      <div className="flex items-center gap-1">
+        <span className="text-muted-foreground">{icon}</span>
+        <ChevronRight size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+      </div>
     </div>
-  </motion.div>
+  </motion.button>
 );
 
 const ActivityHeatmap = ({ dailyLogs }: { dailyLogs: { date: string; gymDone: boolean; studyHours: number; workHours: number }[] }) => {
@@ -39,14 +46,15 @@ const ActivityHeatmap = ({ dailyLogs }: { dailyLogs: { date: string; gymDone: bo
       <p className="text-xs text-muted-foreground uppercase tracking-wider mb-3">Last 30 Days Activity</p>
       <div className="flex gap-1 flex-wrap">
         {last30.map((d) => (
-          <div
+          <motion.div
             key={d.date}
-            className="w-4 h-4 rounded-sm transition-colors"
+            whileHover={{ scale: 1.5 }}
+            className="w-4 h-4 rounded-sm transition-colors cursor-default"
             title={`${d.date}: ${Math.round(d.intensity * 100)}%`}
             style={{
               backgroundColor: d.intensity > 0
-                ? `hsl(172 66% 50% / ${0.15 + d.intensity * 0.85})`
-                : 'hsl(220 14% 12%)',
+                ? `hsl(var(--primary) / ${0.15 + d.intensity * 0.85})`
+                : 'hsl(var(--muted))',
             }}
           />
         ))}
@@ -55,8 +63,20 @@ const ActivityHeatmap = ({ dailyLogs }: { dailyLogs: { date: string; gymDone: bo
   );
 };
 
+const QuickNavCard = ({ icon, label, tab, onTap }: { icon: React.ReactNode; label: string; tab: TrackerTab; onTap: (tab: TrackerTab) => void }) => (
+  <motion.button
+    onClick={() => onTap(tab)}
+    whileHover={{ scale: 1.05, y: -2 }}
+    whileTap={{ scale: 0.95 }}
+    className="glass-card rounded-lg p-3 flex flex-col items-center gap-2 cursor-pointer group"
+  >
+    <div className="text-primary group-hover:text-accent transition-colors">{icon}</div>
+    <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">{label}</span>
+  </motion.button>
+);
+
 export const Dashboard = () => {
-  const { gymSessions, exams, career, dailyLogs } = useTrackerStore();
+  const { gymSessions, exams, career, dailyLogs, setActiveTab } = useTrackerStore();
 
   const totalWorkouts = gymSessions.length;
   const totalStudyHours = dailyLogs.reduce((a, l) => a + l.studyHours, 0);
@@ -83,18 +103,28 @@ export const Dashboard = () => {
     return days;
   }, [dailyLogs]);
 
+  const navigate = (tab: TrackerTab) => setActiveTab(tab);
+
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Dashboard</h2>
-        <p className="text-sm text-muted-foreground mt-1">Your life, quantified.</p>
+        <p className="text-sm text-muted-foreground mt-1">Your life, quantified. Tap any card to dive deeper.</p>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={<Dumbbell size={20} />} label="Workouts" value={String(totalWorkouts)} sub="total sessions" color="text-primary" />
-        <StatCard icon={<Clock size={20} />} label="Study Hours" value={String(totalStudyHours)} sub="total logged" color="text-accent" />
-        <StatCard icon={<Target size={20} />} label="Exam Prep" value={`${examProgress}%`} sub="syllabus covered" color="text-success" />
-        <StatCard icon={<Briefcase size={20} />} label="Tasks Done" value={String(tasksCompleted)} sub="career tasks" color="text-primary" />
+        <StatCard icon={<Dumbbell size={20} />} label="Workouts" value={String(totalWorkouts)} sub="total sessions" color="text-primary" onTap={() => navigate('gym')} />
+        <StatCard icon={<Clock size={20} />} label="Study Hours" value={String(totalStudyHours)} sub="total logged" color="text-accent" onTap={() => navigate('exams')} />
+        <StatCard icon={<Target size={20} />} label="Exam Prep" value={`${examProgress}%`} sub="syllabus covered" color="text-success" onTap={() => navigate('exams')} />
+        <StatCard icon={<Briefcase size={20} />} label="Tasks Done" value={String(tasksCompleted)} sub="career tasks" color="text-primary" onTap={() => navigate('career')} />
+      </div>
+
+      {/* Quick Navigation */}
+      <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
+        <QuickNavCard icon={<Dumbbell size={18} />} label="Gym" tab="gym" onTap={navigate} />
+        <QuickNavCard icon={<BookOpen size={18} />} label="Exams" tab="exams" onTap={navigate} />
+        <QuickNavCard icon={<Briefcase size={18} />} label="Career" tab="career" onTap={navigate} />
+        <QuickNavCard icon={<Target size={18} />} label="Habits" tab="habits" onTap={navigate} />
       </div>
 
       <ActivityHeatmap dailyLogs={dailyLogs} />
@@ -106,26 +136,27 @@ export const Dashboard = () => {
             <AreaChart data={chartData}>
               <defs>
                 <linearGradient id="studyGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(172, 66%, 50%)" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="hsl(172, 66%, 50%)" stopOpacity={0} />
+                  <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="workGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(38, 90%, 55%)" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="hsl(38, 90%, 55%)" stopOpacity={0} />
+                  <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(215, 12%, 50%)' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: 'hsl(215, 12%, 50%)' }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'hsl(220, 18%, 9%)',
-                  border: '1px solid hsl(220, 14%, 16%)',
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
                   borderRadius: '8px',
                   fontSize: '12px',
+                  color: 'hsl(var(--foreground))',
                 }}
               />
-              <Area type="monotone" dataKey="study" stroke="hsl(172, 66%, 50%)" fill="url(#studyGrad)" strokeWidth={2} />
-              <Area type="monotone" dataKey="work" stroke="hsl(38, 90%, 55%)" fill="url(#workGrad)" strokeWidth={2} />
+              <Area type="monotone" dataKey="study" stroke="hsl(var(--primary))" fill="url(#studyGrad)" strokeWidth={2} />
+              <Area type="monotone" dataKey="work" stroke="hsl(var(--accent))" fill="url(#workGrad)" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
         </div>

@@ -98,7 +98,7 @@ export const Sidebar = () => {
           >
             <Palette size={18} />
             <span className="hidden md:inline">Theme</span>
-            <span className="hidden md:inline ml-auto text-xs">{themes.find(t => t.id === theme)?.emoji}</span>
+            <span className="ml-auto text-xs">{themes.find(t => t.id === theme)?.emoji}</span>
           </motion.button>
 
           <AnimatePresence>
@@ -108,7 +108,7 @@ export const Sidebar = () => {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                 transition={{ duration: 0.2 }}
-                className="absolute bottom-full left-0 right-0 mb-2 glass-card rounded-lg p-2 space-y-1 z-50 max-h-64 overflow-y-auto"
+                className="absolute bottom-full left-0 mb-2 glass-card rounded-lg p-2 space-y-1 z-50 max-h-64 overflow-y-auto min-w-[180px] w-max"
               >
                 {themes.map((t) => (
                   <motion.button
@@ -121,8 +121,8 @@ export const Sidebar = () => {
                     }`}
                   >
                     <span>{t.emoji}</span>
-                    <span className="hidden md:inline flex-1 text-left">{t.label}</span>
-                    <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${t.colors}`} />
+                    <span className="flex-1 text-left">{t.label}</span>
+                    <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${t.colors} shrink-0`} />
                   </motion.button>
                 ))}
               </motion.div>
