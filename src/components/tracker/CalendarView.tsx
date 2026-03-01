@@ -1,14 +1,15 @@
 import { useMemo, useState } from 'react';
 import { useTrackerStore } from '@/store/trackerStore';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameDay } from 'date-fns';
-import { ChevronLeft, ChevronRight, Dumbbell, BookOpen, Briefcase, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Dumbbell, BookOpen, Briefcase, CheckCircle2, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { TrackerTab } from '@/types/tracker';
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export const CalendarView = () => {
-  const { gymSessions, exams, career, dailyLogs, habits } = useTrackerStore();
+  const { gymSessions, exams, career, dailyLogs, habits, setActiveTab } = useTrackerStore();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
@@ -21,26 +22,26 @@ export const CalendarView = () => {
   const startDay = getDay(days[0]);
 
   const getEventsForDate = (dateStr: string) => {
-    const events: { type: string; label: string; icon: React.ReactNode }[] = [];
+    const events: { type: string; label: string; icon: React.ReactNode; tab: TrackerTab }[] = [];
 
     // Gym sessions
     const gym = gymSessions.filter((s) => s.date === dateStr);
     if (gym.length > 0) {
-      events.push({ type: 'gym', label: `${gym[0].exercises.length} exercises · ${gym[0].duration}min`, icon: <Dumbbell size={12} /> });
+      events.push({ type: 'gym', label: `${gym[0].exercises.length} exercises · ${gym[0].duration}min`, icon: <Dumbbell size={12} />, tab: 'gym' });
     }
 
     // Daily log
     const log = dailyLogs.find((l) => l.date === dateStr);
     if (log) {
-      if (log.studyHours > 0) events.push({ type: 'study', label: `${log.studyHours}h study`, icon: <BookOpen size={12} /> });
-      if (log.workHours > 0) events.push({ type: 'work', label: `${log.workHours}h work`, icon: <Briefcase size={12} /> });
+      if (log.studyHours > 0) events.push({ type: 'study', label: `${log.studyHours}h study`, icon: <BookOpen size={12} />, tab: 'exams' });
+      if (log.workHours > 0) events.push({ type: 'work', label: `${log.workHours}h work`, icon: <Briefcase size={12} />, tab: 'career' });
     }
 
     // Mock tests
     exams.forEach((exam) => {
       exam.mockTests.forEach((m) => {
         if (m.date === dateStr) {
-          events.push({ type: 'mock', label: `${exam.name}: ${m.score}/${m.totalMarks}`, icon: <BookOpen size={12} /> });
+          events.push({ type: 'mock', label: `${exam.name}: ${m.score}/${m.totalMarks}`, icon: <BookOpen size={12} />, tab: 'exams' });
         }
       });
     });
@@ -49,7 +50,7 @@ export const CalendarView = () => {
     if (career) {
       career.milestones.forEach((m) => {
         if (m.date === dateStr) {
-          events.push({ type: 'milestone', label: m.title, icon: <CheckCircle2 size={12} /> });
+          events.push({ type: 'milestone', label: m.title, icon: <CheckCircle2 size={12} />, tab: 'career' });
         }
       });
     }
@@ -57,7 +58,7 @@ export const CalendarView = () => {
     // Habits
     habits.forEach((h) => {
       if (h.completedDates.includes(dateStr)) {
-        events.push({ type: 'habit', label: `${h.icon} ${h.name}`, icon: <CheckCircle2 size={12} /> });
+        events.push({ type: 'habit', label: `${h.icon} ${h.name}`, icon: <CheckCircle2 size={12} />, tab: 'habits' });
       }
     });
 
@@ -162,10 +163,17 @@ export const CalendarView = () => {
               <p className="text-sm text-muted-foreground">No activities this day</p>
             ) : (
               selectedEvents.map((ev, i) => (
-                <div key={i} className="flex items-center gap-2 py-1">
+                <motion.button
+                  key={i}
+                  onClick={() => setActiveTab(ev.tab)}
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="flex items-center gap-2 py-1.5 w-full text-left group"
+                >
                   <div className={`p-1 rounded ${dotColors[ev.type] || 'bg-muted'} text-primary-foreground`}>{ev.icon}</div>
-                  <span className="text-sm">{ev.label}</span>
-                </div>
+                  <span className="text-sm flex-1">{ev.label}</span>
+                  <ExternalLink size={12} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                </motion.button>
               ))
             )}
           </motion.div>
