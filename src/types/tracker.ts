@@ -76,4 +76,4 @@ export interface DailyLog {
   mood: 1 | 2 | 3 | 4 | 5;
 }
 
-export type TrackerTab = 'dashboard' | 'gym' | 'exams' | 'career' | 'reports';
+export type TrackerTab = 'dashboard' | 'gym' | 'exams' | 'career' | 'pomodoro' | 'reports';
