@@ -2,18 +2,18 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
-// Apply theme from localStorage before render
+// Apply theme from localStorage before render to prevent flash
 const stored = localStorage.getItem('lifeos-tracker');
 if (stored) {
   try {
     const parsed = JSON.parse(stored);
-    if (parsed?.state?.theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    }
-  } catch {}
+    const theme = parsed?.state?.theme || 'sakura-dark';
+    document.documentElement.classList.add(`theme-${theme}`);
+  } catch {
+    document.documentElement.classList.add('theme-sakura-dark');
+  }
 } else {
-  // Default to dark
-  document.documentElement.classList.add('dark');
+  document.documentElement.classList.add('theme-sakura-dark');
 }
 
 createRoot(document.getElementById("root")!).render(<App />);

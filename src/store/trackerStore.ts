@@ -1,6 +1,25 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { GymSession, ExamPrep, CareerProfile, DailyLog, TrackerTab, Habit } from '@/types/tracker';
+import type { GymSession, ExamPrep, CareerProfile, DailyLog, TrackerTab, Habit, AppTheme } from '@/types/tracker';
+
+const THEME_CLASSES: Record<AppTheme, string> = {
+  'sakura-dark': 'theme-sakura-dark',
+  'sakura-light': 'theme-sakura-light',
+  'cyberpunk': 'theme-cyberpunk',
+  'ocean-deep': 'theme-ocean-deep',
+  'forest': 'theme-forest',
+  'sunset-blaze': 'theme-sunset-blaze',
+  'arctic': 'theme-arctic',
+  'retrowave': 'theme-retrowave',
+};
+
+function applyThemeClass(theme: AppTheme) {
+  const root = document.documentElement;
+  // Remove all theme classes
+  Object.values(THEME_CLASSES).forEach((cls) => root.classList.remove(cls));
+  // Add the new one
+  root.classList.add(THEME_CLASSES[theme]);
+}
 
 interface TrackerState {
   activeTab: TrackerTab;
@@ -34,8 +53,8 @@ interface TrackerState {
   removeHabit: (id: string) => void;
   toggleHabitDate: (habitId: string, date: string) => void;
 
-  theme: 'light' | 'dark';
-  setTheme: (theme: 'light' | 'dark') => void;
+  theme: AppTheme;
+  setTheme: (theme: AppTheme) => void;
 }
 
 export const useTrackerStore = create<TrackerState>()(
@@ -154,23 +173,19 @@ export const useTrackerStore = create<TrackerState>()(
           ),
         })),
 
-      theme: 'dark',
+      theme: 'sakura-dark',
       setTheme: (theme) => {
-        if (theme === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
+        applyThemeClass(theme);
         return set({ theme });
       },
     }),
     {
       name: 'lifeos-tracker',
       onRehydrateStorage: () => (state) => {
-        if (state?.theme === 'dark') {
-          document.documentElement.classList.add('dark');
+        if (state?.theme) {
+          applyThemeClass(state.theme);
         } else {
-          document.documentElement.classList.remove('dark');
+          applyThemeClass('sakura-dark');
         }
       },
     }
