@@ -4,6 +4,7 @@ import { GymTracker } from '@/components/tracker/GymTracker';
 import { ExamTracker } from '@/components/tracker/ExamTracker';
 import { CareerTracker } from '@/components/tracker/CareerTracker';
 import { Reports } from '@/components/tracker/Reports';
+import { PomodoroTimer } from '@/components/tracker/PomodoroTimer';
 import { DailyCheckIn } from '@/components/tracker/DailyCheckIn';
 import { useTrackerStore } from '@/store/trackerStore';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -17,6 +18,7 @@ const Index = () => {
       case 'gym': return <GymTracker />;
       case 'exams': return <ExamTracker />;
       case 'career': return <CareerTracker />;
+      case 'pomodoro': return <PomodoroTimer />;
       case 'reports': return <Reports />;
     }
   };

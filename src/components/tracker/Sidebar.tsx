@@ -1,6 +1,6 @@
 import { useTrackerStore } from '@/store/trackerStore';
 import type { TrackerTab } from '@/types/tracker';
-import { LayoutDashboard, Dumbbell, BookOpen, Briefcase, BarChart3, Flame } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, BookOpen, Briefcase, BarChart3, Flame, Timer } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useMemo } from 'react';
 import { format } from 'date-fns';
@@ -10,6 +10,7 @@ const tabs: { id: TrackerTab; label: string; icon: React.ReactNode }[] = [
   { id: 'gym', label: 'Gym', icon: <Dumbbell size={18} /> },
   { id: 'exams', label: 'Exams', icon: <BookOpen size={18} /> },
   { id: 'career', label: 'Career', icon: <Briefcase size={18} /> },
+  { id: 'pomodoro', label: 'Pomodoro', icon: <Timer size={18} /> },
   { id: 'reports', label: 'Reports', icon: <BarChart3 size={18} /> },
 ];
 
