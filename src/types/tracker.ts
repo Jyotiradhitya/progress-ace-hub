@@ -86,3 +86,5 @@ export interface Habit {
 }
 
 export type TrackerTab = 'dashboard' | 'gym' | 'exams' | 'career' | 'pomodoro' | 'calendar' | 'habits' | 'reports';
+
+export type AppTheme = 'sakura-dark' | 'sakura-light' | 'cyberpunk' | 'ocean-deep' | 'forest' | 'sunset-blaze' | 'arctic' | 'retrowave';

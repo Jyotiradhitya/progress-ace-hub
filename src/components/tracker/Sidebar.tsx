@@ -1,8 +1,8 @@
 import { useTrackerStore } from '@/store/trackerStore';
-import type { TrackerTab } from '@/types/tracker';
-import { LayoutDashboard, Dumbbell, BookOpen, Briefcase, BarChart3, Flame, Timer, CalendarDays, Heart, Sun, Moon } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useMemo } from 'react';
+import type { TrackerTab, AppTheme } from '@/types/tracker';
+import { LayoutDashboard, Dumbbell, BookOpen, Briefcase, BarChart3, Flame, Timer, CalendarDays, Heart, Palette } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useMemo, useState } from 'react';
 import { format } from 'date-fns';
 
 const tabs: { id: TrackerTab; label: string; icon: React.ReactNode }[] = [
@@ -16,8 +16,20 @@ const tabs: { id: TrackerTab; label: string; icon: React.ReactNode }[] = [
   { id: 'reports', label: 'Reports', icon: <BarChart3 size={18} /> },
 ];
 
+const themes: { id: AppTheme; label: string; emoji: string; colors: string }[] = [
+  { id: 'sakura-dark', label: 'Sakura Dark', emoji: '🌸', colors: 'from-pink-500 to-yellow-500' },
+  { id: 'sakura-light', label: 'Sakura Light', emoji: '🌷', colors: 'from-pink-400 to-amber-400' },
+  { id: 'cyberpunk', label: 'Cyberpunk', emoji: '⚡', colors: 'from-green-400 to-fuchsia-500' },
+  { id: 'ocean-deep', label: 'Ocean Deep', emoji: '🌊', colors: 'from-cyan-500 to-teal-500' },
+  { id: 'forest', label: 'Forest', emoji: '🌿', colors: 'from-emerald-500 to-yellow-500' },
+  { id: 'sunset-blaze', label: 'Sunset Blaze', emoji: '🔥', colors: 'from-orange-500 to-rose-500' },
+  { id: 'arctic', label: 'Arctic', emoji: '❄️', colors: 'from-blue-400 to-violet-500' },
+  { id: 'retrowave', label: 'Retrowave', emoji: '🎶', colors: 'from-fuchsia-500 to-cyan-400' },
+];
+
 export const Sidebar = () => {
   const { activeTab, setActiveTab, dailyLogs, theme, setTheme } = useTrackerStore();
+  const [themeOpen, setThemeOpen] = useState(false);
 
   const streak = useMemo(() => {
     const today = new Date();
@@ -45,9 +57,11 @@ export const Sidebar = () => {
 
       <nav className="flex-1 space-y-1 px-2 md:px-3 overflow-y-auto">
         {tabs.map((tab) => (
-          <button
+          <motion.button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
+            whileHover={{ x: 4 }}
+            whileTap={{ scale: 0.97 }}
             className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors ${
               activeTab === tab.id
                 ? 'text-primary bg-sidebar-accent'
@@ -61,30 +75,79 @@ export const Sidebar = () => {
                 transition={{ type: 'spring', stiffness: 350, damping: 30 }}
               />
             )}
-            <span className="relative z-10">{tab.icon}</span>
+            <motion.span 
+              className="relative z-10"
+              animate={{ rotate: activeTab === tab.id ? [0, -10, 10, 0] : 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              {tab.icon}
+            </motion.span>
             <span className="relative z-10 hidden md:inline">{tab.label}</span>
-          </button>
+          </motion.button>
         ))}
       </nav>
 
       <div className="px-3 md:px-5 space-y-3 mt-auto">
-        {/* Theme Toggle */}
-        <button
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
-        >
-          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-          <span className="hidden md:inline">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
-        </button>
+        {/* Theme Selector */}
+        <div className="relative">
+          <motion.button
+            onClick={() => setThemeOpen(!themeOpen)}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
+          >
+            <Palette size={18} />
+            <span className="hidden md:inline">Theme</span>
+            <span className="hidden md:inline ml-auto text-xs">{themes.find(t => t.id === theme)?.emoji}</span>
+          </motion.button>
+
+          <AnimatePresence>
+            {themeOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className="absolute bottom-full left-0 right-0 mb-2 glass-card rounded-lg p-2 space-y-1 z-50 max-h-64 overflow-y-auto"
+              >
+                {themes.map((t) => (
+                  <motion.button
+                    key={t.id}
+                    onClick={() => { setTheme(t.id); setThemeOpen(false); }}
+                    whileHover={{ x: 3 }}
+                    whileTap={{ scale: 0.97 }}
+                    className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-colors ${
+                      theme === t.id ? 'bg-primary/20 text-primary' : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
+                    }`}
+                  >
+                    <span>{t.emoji}</span>
+                    <span className="hidden md:inline flex-1 text-left">{t.label}</span>
+                    <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${t.colors}`} />
+                  </motion.button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         {streak > 0 && (
-          <div className="glass-card rounded-lg p-3 flex items-center gap-2">
+          <motion.div 
+            className="glass-card rounded-lg p-3 flex items-center gap-2"
+            animate={{ 
+              boxShadow: [
+                '0 0 0 0 hsl(var(--accent) / 0)',
+                '0 0 20px 0 hsl(var(--accent) / 0.2)',
+                '0 0 0 0 hsl(var(--accent) / 0)',
+              ]
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
             <Flame size={18} className="text-accent animate-pulse-glow" />
             <div className="hidden md:block">
               <p className="text-xs text-muted-foreground">Streak</p>
               <p className="font-mono text-sm font-bold text-accent">{streak} days</p>
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
     </div>
