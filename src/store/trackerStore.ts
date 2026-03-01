@@ -1,17 +1,15 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { GymSession, ExamPrep, CareerProfile, DailyLog, TrackerTab } from '@/types/tracker';
+import type { GymSession, ExamPrep, CareerProfile, DailyLog, TrackerTab, Habit } from '@/types/tracker';
 
 interface TrackerState {
   activeTab: TrackerTab;
   setActiveTab: (tab: TrackerTab) => void;
 
-  // Gym
   gymSessions: GymSession[];
   addGymSession: (session: GymSession) => void;
   removeGymSession: (id: string) => void;
 
-  // Exams
   exams: ExamPrep[];
   addExam: (exam: ExamPrep) => void;
   updateExam: (id: string, exam: Partial<ExamPrep>) => void;
@@ -19,7 +17,6 @@ interface TrackerState {
   addMockTest: (examId: string, test: ExamPrep['mockTests'][0]) => void;
   updateSubjectProgress: (examId: string, subjectId: string, completed: number) => void;
 
-  // Career
   career: CareerProfile | null;
   setCareer: (profile: CareerProfile) => void;
   addCareerTask: (task: CareerProfile['tasks'][0]) => void;
@@ -29,9 +26,16 @@ interface TrackerState {
   addMilestone: (milestone: CareerProfile['milestones'][0]) => void;
   toggleMilestone: (milestoneId: string) => void;
 
-  // Daily Logs
   dailyLogs: DailyLog[];
   addDailyLog: (log: DailyLog) => void;
+
+  habits: Habit[];
+  addHabit: (habit: Habit) => void;
+  removeHabit: (id: string) => void;
+  toggleHabitDate: (habitId: string, date: string) => void;
+
+  theme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark') => void;
 }
 
 export const useTrackerStore = create<TrackerState>()(
@@ -132,7 +136,43 @@ export const useTrackerStore = create<TrackerState>()(
             log,
           ],
         })),
+
+      habits: [],
+      addHabit: (habit) => set((s) => ({ habits: [...s.habits, habit] })),
+      removeHabit: (id) => set((s) => ({ habits: s.habits.filter((h) => h.id !== id) })),
+      toggleHabitDate: (habitId, date) =>
+        set((s) => ({
+          habits: s.habits.map((h) =>
+            h.id === habitId
+              ? {
+                  ...h,
+                  completedDates: h.completedDates.includes(date)
+                    ? h.completedDates.filter((d) => d !== date)
+                    : [...h.completedDates, date],
+                }
+              : h
+          ),
+        })),
+
+      theme: 'dark',
+      setTheme: (theme) => {
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+        return set({ theme });
+      },
     }),
-    { name: 'lifeos-tracker' }
+    {
+      name: 'lifeos-tracker',
+      onRehydrateStorage: () => (state) => {
+        if (state?.theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      },
+    }
   )
 );

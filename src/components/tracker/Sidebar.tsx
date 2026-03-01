@@ -1,6 +1,6 @@
 import { useTrackerStore } from '@/store/trackerStore';
 import type { TrackerTab } from '@/types/tracker';
-import { LayoutDashboard, Dumbbell, BookOpen, Briefcase, BarChart3, Flame, Timer } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, BookOpen, Briefcase, BarChart3, Flame, Timer, CalendarDays, Heart, Sun, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useMemo } from 'react';
 import { format } from 'date-fns';
@@ -11,11 +11,13 @@ const tabs: { id: TrackerTab; label: string; icon: React.ReactNode }[] = [
   { id: 'exams', label: 'Exams', icon: <BookOpen size={18} /> },
   { id: 'career', label: 'Career', icon: <Briefcase size={18} /> },
   { id: 'pomodoro', label: 'Pomodoro', icon: <Timer size={18} /> },
+  { id: 'calendar', label: 'Calendar', icon: <CalendarDays size={18} /> },
+  { id: 'habits', label: 'Habits', icon: <Heart size={18} /> },
   { id: 'reports', label: 'Reports', icon: <BarChart3 size={18} /> },
 ];
 
 export const Sidebar = () => {
-  const { activeTab, setActiveTab, dailyLogs } = useTrackerStore();
+  const { activeTab, setActiveTab, dailyLogs, theme, setTheme } = useTrackerStore();
 
   const streak = useMemo(() => {
     const today = new Date();
@@ -41,7 +43,7 @@ export const Sidebar = () => {
         </div>
       </div>
 
-      <nav className="flex-1 space-y-1 px-2 md:px-3">
+      <nav className="flex-1 space-y-1 px-2 md:px-3 overflow-y-auto">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -65,8 +67,17 @@ export const Sidebar = () => {
         ))}
       </nav>
 
-      {streak > 0 && (
-        <div className="px-3 md:px-5 mt-auto">
+      <div className="px-3 md:px-5 space-y-3 mt-auto">
+        {/* Theme Toggle */}
+        <button
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
+        >
+          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          <span className="hidden md:inline">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+        </button>
+
+        {streak > 0 && (
           <div className="glass-card rounded-lg p-3 flex items-center gap-2">
             <Flame size={18} className="text-accent animate-pulse-glow" />
             <div className="hidden md:block">
@@ -74,8 +85,8 @@ export const Sidebar = () => {
               <p className="font-mono text-sm font-bold text-accent">{streak} days</p>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
