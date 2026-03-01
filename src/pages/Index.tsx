@@ -1,4 +1,4 @@
-import { Sidebar } from '@/components/tracker/Sidebar';
+import { Sidebar, MobileBottomNav } from '@/components/tracker/Sidebar';
 import { Dashboard } from '@/components/tracker/Dashboard';
 import { GymTracker } from '@/components/tracker/GymTracker';
 import { ExamTracker } from '@/components/tracker/ExamTracker';
@@ -23,6 +23,7 @@ const pageVariants = {
 const Index = () => {
   const { activeTab } = useTrackerStore();
   const [showSplash, setShowSplash] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const handleSplashComplete = useCallback(() => setShowSplash(false), []);
 
@@ -51,7 +52,8 @@ const Index = () => {
             transition={{ duration: 0.5 }}
             className="flex h-screen bg-background overflow-hidden"
           >
-            <Sidebar />
+            <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(c => !c)} />
+            <MobileBottomNav />
             <main className="flex-1 flex flex-col overflow-hidden">
               <motion.header
                 initial={{ y: -20, opacity: 0 }}
@@ -59,11 +61,12 @@ const Index = () => {
                 transition={{ delay: 0.2, duration: 0.4 }}
                 className="h-12 md:h-14 border-b border-border flex items-center justify-between px-3 md:px-6 shrink-0"
               >
-                <div />
+                <h1 className="md:hidden text-base font-bold gradient-text">LifeOS</h1>
+                <div className="hidden md:block" />
                 <DailyCheckIn />
               </motion.header>
               <ScrollArea className="flex-1">
-                <div className="p-3 md:p-6 max-w-4xl mx-auto">
+                <div className="p-3 md:p-6 pb-20 md:pb-6 max-w-4xl mx-auto">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activeTab}
