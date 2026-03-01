@@ -47,7 +47,7 @@ export const Sidebar = () => {
   }, [dailyLogs]);
 
   return (
-    <div className="w-16 md:w-56 h-screen bg-sidebar border-r border-sidebar-border flex flex-col py-6 shrink-0">
+    <div className="w-14 md:w-56 h-screen bg-sidebar border-r border-sidebar-border flex flex-col py-4 md:py-6 shrink-0">
       <div className="px-3 md:px-5 mb-8">
         <h1 className="hidden md:block text-lg font-bold gradient-text">LifeOS</h1>
         <div className="md:hidden flex justify-center">

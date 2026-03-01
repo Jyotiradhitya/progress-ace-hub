@@ -112,15 +112,15 @@ export const Dashboard = () => {
         <p className="text-sm text-muted-foreground mt-1">Your life, quantified. Tap any card to dive deeper.</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         <StatCard icon={<Dumbbell size={20} />} label="Workouts" value={String(totalWorkouts)} sub="total sessions" color="text-primary" onTap={() => navigate('gym')} />
-        <StatCard icon={<Clock size={20} />} label="Study Hours" value={String(totalStudyHours)} sub="total logged" color="text-accent" onTap={() => navigate('exams')} />
-        <StatCard icon={<Target size={20} />} label="Exam Prep" value={`${examProgress}%`} sub="syllabus covered" color="text-success" onTap={() => navigate('exams')} />
+        <StatCard icon={<Clock size={20} />} label="Study Hrs" value={String(totalStudyHours)} sub="total logged" color="text-accent" onTap={() => navigate('exams')} />
+        <StatCard icon={<Target size={20} />} label="Exam Prep" value={`${examProgress}%`} sub="syllabus done" color="text-success" onTap={() => navigate('exams')} />
         <StatCard icon={<Briefcase size={20} />} label="Tasks Done" value={String(tasksCompleted)} sub="career tasks" color="text-primary" onTap={() => navigate('career')} />
       </div>
 
       {/* Quick Navigation */}
-      <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
+      <div className="grid grid-cols-4 gap-2">
         <QuickNavCard icon={<Dumbbell size={18} />} label="Gym" tab="gym" onTap={navigate} />
         <QuickNavCard icon={<BookOpen size={18} />} label="Exams" tab="exams" onTap={navigate} />
         <QuickNavCard icon={<Briefcase size={18} />} label="Career" tab="career" onTap={navigate} />
