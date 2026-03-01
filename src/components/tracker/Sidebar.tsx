@@ -197,94 +197,95 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
 
 // Mobile bottom navigation bar
 export const MobileBottomNav = () => {
-  const { activeTab, setActiveTab } = useTrackerStore();
+  const { activeTab, setActiveTab, theme, setTheme } = useTrackerStore();
+  const [showMore, setShowMore] = useState(false);
 
-  // Show only 5 main tabs on mobile bottom nav for space
   const mobileTabs = tabs.slice(0, 5);
   const moreTabs = tabs.slice(5);
-  const [showMore, setShowMore] = useState(false);
   const isMoreActive = moreTabs.some(t => t.id === activeTab);
 
   return (
     <>
       {/* More menu overlay */}
-      <AnimatePresence>
-        {showMore && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm md:hidden"
-            onClick={() => setShowMore(false)}
+      {showMore && (
+        <div
+          className="fixed inset-0 z-[60] md:hidden"
+          onClick={() => setShowMore(false)}
+          style={{ background: 'rgba(0,0,0,0.5)' }}
+        >
+          <div
+            className="absolute bottom-16 left-3 right-3 rounded-xl border border-border bg-card p-3 shadow-xl safe-area-bottom"
+            onClick={(e) => e.stopPropagation()}
           >
-            <motion.div
-              initial={{ y: 100, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 100, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="absolute bottom-16 left-4 right-4 glass-card rounded-xl p-3 grid grid-cols-3 gap-2"
-              onClick={(e) => e.stopPropagation()}
-            >
+            {/* Extra tabs */}
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 px-1">Navigation</p>
+            <div className="grid grid-cols-3 gap-2 mb-3">
               {moreTabs.map((tab) => (
-                <motion.button
+                <button
                   key={tab.id}
                   onClick={() => { setActiveTab(tab.id); setShowMore(false); }}
-                  whileTap={{ scale: 0.9 }}
                   className={`flex flex-col items-center gap-1.5 py-3 rounded-lg text-xs transition-colors ${
                     activeTab === tab.id
                       ? 'text-primary bg-primary/10'
-                      : 'text-muted-foreground hover:bg-muted/50'
+                      : 'text-muted-foreground'
                   }`}
                 >
                   {tab.icon}
                   <span>{tab.label}</span>
-                </motion.button>
+                </button>
               ))}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+
+            {/* Theme picker */}
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 px-1">Theme</p>
+            <div className="grid grid-cols-4 gap-1.5">
+              {themes.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => { setTheme(t.id); }}
+                  className={`flex flex-col items-center gap-1 py-2 rounded-lg text-[10px] transition-colors ${
+                    theme === t.id ? 'bg-primary/15 text-primary ring-1 ring-primary/30' : 'text-muted-foreground'
+                  }`}
+                >
+                  <span className="text-base">{t.emoji}</span>
+                  <span className="truncate w-full text-center">{t.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bottom nav bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-sidebar/95 backdrop-blur-xl border-t border-sidebar-border safe-area-bottom">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[50] bg-sidebar/95 backdrop-blur-xl border-t border-sidebar-border safe-area-bottom">
         <div className="flex items-center justify-around px-1 h-14">
           {mobileTabs.map((tab) => (
-            <motion.button
+            <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              whileTap={{ scale: 0.85 }}
-              className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors min-w-[48px] ${
-                activeTab === tab.id
-                  ? 'text-primary'
-                  : 'text-muted-foreground'
+              onClick={() => { setActiveTab(tab.id); setShowMore(false); }}
+              className={`relative flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors min-w-[48px] ${
+                activeTab === tab.id ? 'text-primary' : 'text-muted-foreground'
               }`}
             >
               {activeTab === tab.id && (
-                <motion.div
-                  layoutId="mobile-nav-active"
-                  className="absolute top-0 w-8 h-0.5 rounded-full bg-primary"
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                />
+                <span className="absolute top-0 w-8 h-0.5 rounded-full bg-primary" />
               )}
-              <span className="relative">{tab.icon}</span>
+              <span>{tab.icon}</span>
               <span className="text-[10px] leading-none">{tab.label}</span>
-            </motion.button>
+            </button>
           ))}
           {/* More button */}
-          <motion.button
-            onClick={() => setShowMore(!showMore)}
-            whileTap={{ scale: 0.85 }}
+          <button
+            onClick={() => setShowMore(v => !v)}
             className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors min-w-[48px] ${
-              isMoreActive || showMore
-                ? 'text-primary'
-                : 'text-muted-foreground'
+              isMoreActive || showMore ? 'text-primary' : 'text-muted-foreground'
             }`}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
             </svg>
             <span className="text-[10px] leading-none">More</span>
-          </motion.button>
+          </button>
         </div>
       </div>
     </>
