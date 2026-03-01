@@ -6,56 +6,107 @@
 
 @layer base {
   :root {
-    --background: 220 20% 6%;
-    --foreground: 210 20% 92%;
+    --background: 40 30% 96%;
+    --foreground: 240 15% 15%;
 
-    --card: 220 18% 9%;
-    --card-foreground: 210 20% 92%;
+    --card: 40 20% 99%;
+    --card-foreground: 240 15% 15%;
 
-    --popover: 220 18% 9%;
-    --popover-foreground: 210 20% 92%;
+    --popover: 40 20% 99%;
+    --popover-foreground: 240 15% 15%;
 
-    --primary: 172 66% 50%;
-    --primary-foreground: 220 20% 6%;
+    --primary: 340 60% 52%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 16% 14%;
-    --secondary-foreground: 210 20% 80%;
+    --secondary: 340 15% 92%;
+    --secondary-foreground: 240 15% 25%;
 
-    --muted: 220 14% 12%;
-    --muted-foreground: 215 12% 50%;
+    --muted: 40 15% 92%;
+    --muted-foreground: 240 10% 45%;
 
-    --accent: 38 90% 55%;
-    --accent-foreground: 220 20% 6%;
+    --accent: 45 65% 52%;
+    --accent-foreground: 240 15% 10%;
 
     --destructive: 0 72% 51%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 220 14% 16%;
-    --input: 220 14% 16%;
-    --ring: 172 66% 50%;
+    --border: 340 12% 88%;
+    --input: 340 12% 88%;
+    --ring: 340 60% 52%;
 
     --radius: 0.5rem;
 
-    --success: 142 70% 45%;
-    --success-foreground: 220 20% 6%;
+    --success: 152 60% 40%;
+    --success-foreground: 0 0% 100%;
 
-    --warning: 38 90% 55%;
-    --warning-foreground: 220 20% 6%;
+    --warning: 45 65% 52%;
+    --warning-foreground: 240 15% 10%;
 
-    --chart-1: 172 66% 50%;
-    --chart-2: 38 90% 55%;
-    --chart-3: 262 60% 55%;
-    --chart-4: 142 70% 45%;
+    --chart-1: 340 60% 52%;
+    --chart-2: 45 65% 52%;
+    --chart-3: 280 45% 55%;
+    --chart-4: 152 60% 40%;
     --chart-5: 0 72% 51%;
 
-    --sidebar-background: 220 18% 7%;
-    --sidebar-foreground: 210 20% 80%;
-    --sidebar-primary: 172 66% 50%;
-    --sidebar-primary-foreground: 220 20% 6%;
-    --sidebar-accent: 220 16% 14%;
-    --sidebar-accent-foreground: 210 20% 80%;
-    --sidebar-border: 220 14% 16%;
-    --sidebar-ring: 172 66% 50%;
+    --sidebar-background: 40 25% 97%;
+    --sidebar-foreground: 240 10% 35%;
+    --sidebar-primary: 340 60% 52%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 340 15% 92%;
+    --sidebar-accent-foreground: 240 15% 25%;
+    --sidebar-border: 340 12% 88%;
+    --sidebar-ring: 340 60% 52%;
+  }
+
+  .dark {
+    --background: 260 18% 6%;
+    --foreground: 340 15% 92%;
+
+    --card: 260 15% 10%;
+    --card-foreground: 340 15% 92%;
+
+    --popover: 260 15% 10%;
+    --popover-foreground: 340 15% 92%;
+
+    --primary: 340 65% 65%;
+    --primary-foreground: 260 18% 6%;
+
+    --secondary: 260 12% 16%;
+    --secondary-foreground: 340 15% 80%;
+
+    --muted: 260 12% 13%;
+    --muted-foreground: 260 10% 50%;
+
+    --accent: 45 70% 60%;
+    --accent-foreground: 260 18% 6%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 340 15% 92%;
+
+    --border: 260 12% 18%;
+    --input: 260 12% 18%;
+    --ring: 340 65% 65%;
+
+    --success: 152 60% 45%;
+    --success-foreground: 260 18% 6%;
+
+    --warning: 45 70% 60%;
+    --warning-foreground: 260 18% 6%;
+
+    --chart-1: 340 65% 65%;
+    --chart-2: 45 70% 60%;
+    --chart-3: 280 50% 60%;
+    --chart-4: 152 60% 45%;
+    --chart-5: 0 72% 51%;
+
+    --sidebar-background: 260 18% 7%;
+    --sidebar-foreground: 340 15% 80%;
+    --sidebar-primary: 340 65% 65%;
+    --sidebar-primary-foreground: 260 18% 6%;
+    --sidebar-accent: 260 12% 16%;
+    --sidebar-accent-foreground: 340 15% 80%;
+    --sidebar-border: 260 12% 18%;
+    --sidebar-ring: 340 65% 65%;
   }
 }
 
@@ -79,11 +130,11 @@
   }
 
   .glow-primary {
-    box-shadow: 0 0 20px hsl(172 66% 50% / 0.15), 0 0 60px hsl(172 66% 50% / 0.05);
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.15), 0 0 60px hsl(var(--primary) / 0.05);
   }
 
   .glow-accent {
-    box-shadow: 0 0 20px hsl(38 90% 55% / 0.15), 0 0 60px hsl(38 90% 55% / 0.05);
+    box-shadow: 0 0 20px hsl(var(--accent) / 0.15), 0 0 60px hsl(var(--accent) / 0.05);
   }
 
   .glass-card {
@@ -95,6 +146,6 @@
   }
 
   .stat-glow {
-    box-shadow: inset 0 1px 0 0 hsl(172 66% 50% / 0.1), 0 0 0 1px hsl(220 14% 16%);
+    box-shadow: inset 0 1px 0 0 hsl(var(--primary) / 0.1), 0 0 0 1px hsl(var(--border));
   }
 }

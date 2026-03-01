@@ -12,7 +12,7 @@ export interface GymSession {
   id: string;
   date: string;
   exercises: GymExercise[];
-  duration: number; // minutes
+  duration: number;
   notes?: string;
 }
 
@@ -30,7 +30,7 @@ export interface MockTest {
   date: string;
   score: number;
   totalMarks: number;
-  timeTaken: number; // minutes
+  timeTaken: number;
 }
 
 export interface ExamPrep {
@@ -54,7 +54,7 @@ export interface CareerTask {
 export interface Skill {
   id: string;
   name: string;
-  level: number; // 1-10
+  level: number;
   targetLevel: number;
 }
 
@@ -76,4 +76,13 @@ export interface DailyLog {
   mood: 1 | 2 | 3 | 4 | 5;
 }
 
-export type TrackerTab = 'dashboard' | 'gym' | 'exams' | 'career' | 'pomodoro' | 'reports';
+export interface Habit {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  completedDates: string[];
+  createdAt: string;
+}
+
+export type TrackerTab = 'dashboard' | 'gym' | 'exams' | 'career' | 'pomodoro' | 'calendar' | 'habits' | 'reports';
