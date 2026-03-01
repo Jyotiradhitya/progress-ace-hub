@@ -1,12 +1,40 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Sidebar } from '@/components/tracker/Sidebar';
+import { Dashboard } from '@/components/tracker/Dashboard';
+import { GymTracker } from '@/components/tracker/GymTracker';
+import { ExamTracker } from '@/components/tracker/ExamTracker';
+import { CareerTracker } from '@/components/tracker/CareerTracker';
+import { Reports } from '@/components/tracker/Reports';
+import { DailyCheckIn } from '@/components/tracker/DailyCheckIn';
+import { useTrackerStore } from '@/store/trackerStore';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const Index = () => {
+  const { activeTab } = useTrackerStore();
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard': return <Dashboard />;
+      case 'gym': return <GymTracker />;
+      case 'exams': return <ExamTracker />;
+      case 'career': return <CareerTracker />;
+      case 'reports': return <Reports />;
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="flex h-screen bg-background overflow-hidden">
+      <Sidebar />
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <header className="h-14 border-b border-border flex items-center justify-between px-6 shrink-0">
+          <div />
+          <DailyCheckIn />
+        </header>
+        <ScrollArea className="flex-1">
+          <div className="p-6 max-w-4xl mx-auto">
+            {renderContent()}
+          </div>
+        </ScrollArea>
+      </main>
     </div>
   );
 };
