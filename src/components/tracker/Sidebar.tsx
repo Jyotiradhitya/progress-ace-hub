@@ -1,6 +1,6 @@
 import { useTrackerStore } from '@/store/trackerStore';
 import type { TrackerTab, AppTheme } from '@/types/tracker';
-import { LayoutDashboard, Dumbbell, BookOpen, Briefcase, BarChart3, Flame, Timer, CalendarDays, Heart, Palette } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, BookOpen, Briefcase, BarChart3, Flame, Timer, CalendarDays, Heart, Palette, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMemo, useState } from 'react';
 import { format } from 'date-fns';
@@ -27,7 +27,12 @@ const themes: { id: AppTheme; label: string; emoji: string; colors: string }[] =
   { id: 'retrowave', label: 'Retrowave', emoji: '🎶', colors: 'from-fuchsia-500 to-cyan-400' },
 ];
 
-export const Sidebar = () => {
+interface SidebarProps {
+  collapsed: boolean;
+  onToggle: () => void;
+}
+
+export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
   const { activeTab, setActiveTab, dailyLogs, theme, setTheme } = useTrackerStore();
   const [themeOpen, setThemeOpen] = useState(false);
 
@@ -47,21 +52,47 @@ export const Sidebar = () => {
   }, [dailyLogs]);
 
   return (
-    <div className="w-14 md:w-56 h-screen bg-sidebar border-r border-sidebar-border flex flex-col py-4 md:py-6 shrink-0">
-      <div className="px-3 md:px-5 mb-8">
-        <h1 className="hidden md:block text-lg font-bold gradient-text">LifeOS</h1>
-        <div className="md:hidden flex justify-center">
-          <span className="gradient-text font-bold text-lg">L</span>
-        </div>
+    <motion.div
+      animate={{ width: collapsed ? 56 : 224 }}
+      transition={{ duration: 0.25, ease: 'easeInOut' }}
+      className="hidden md:flex h-screen bg-sidebar border-r border-sidebar-border flex-col py-4 shrink-0 overflow-hidden"
+    >
+      {/* Header */}
+      <div className="px-3 mb-6 flex items-center justify-between">
+        <AnimatePresence mode="wait">
+          {!collapsed && (
+            <motion.h1
+              key="title"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.15 }}
+              className="text-lg font-bold gradient-text whitespace-nowrap"
+            >
+              LifeOS
+            </motion.h1>
+          )}
+        </AnimatePresence>
+        <motion.button
+          onClick={onToggle}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="p-1.5 rounded-md text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors shrink-0"
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {collapsed ? <PanelLeft size={18} /> : <PanelLeftClose size={18} />}
+        </motion.button>
       </div>
 
-      <nav className="flex-1 space-y-1 px-2 md:px-3 overflow-y-auto">
+      {/* Nav tabs */}
+      <nav className="flex-1 space-y-1 px-2 overflow-y-auto">
         {tabs.map((tab) => (
           <motion.button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            whileHover={{ x: 4 }}
+            whileHover={{ x: 2 }}
             whileTap={{ scale: 0.97 }}
+            title={collapsed ? tab.label : undefined}
             className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors ${
               activeTab === tab.id
                 ? 'text-primary bg-sidebar-accent'
@@ -75,30 +106,38 @@ export const Sidebar = () => {
                 transition={{ type: 'spring', stiffness: 350, damping: 30 }}
               />
             )}
-            <motion.span 
-              className="relative z-10"
-              animate={{ rotate: activeTab === tab.id ? [0, -10, 10, 0] : 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              {tab.icon}
-            </motion.span>
-            <span className="relative z-10 hidden md:inline">{tab.label}</span>
+            <span className="relative z-10 shrink-0">{tab.icon}</span>
+            <AnimatePresence>
+              {!collapsed && (
+                <motion.span
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: 'auto' }}
+                  exit={{ opacity: 0, width: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="relative z-10 whitespace-nowrap overflow-hidden"
+                >
+                  {tab.label}
+                </motion.span>
+              )}
+            </AnimatePresence>
           </motion.button>
         ))}
       </nav>
 
-      <div className="px-3 md:px-5 space-y-3 mt-auto">
+      {/* Bottom section */}
+      <div className="px-2 space-y-2 mt-auto">
         {/* Theme Selector */}
         <div className="relative">
           <motion.button
             onClick={() => setThemeOpen(!themeOpen)}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
+            title={collapsed ? 'Theme' : undefined}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
           >
-            <Palette size={18} />
-            <span className="hidden md:inline">Theme</span>
-            <span className="ml-auto text-xs">{themes.find(t => t.id === theme)?.emoji}</span>
+            <Palette size={18} className="shrink-0" />
+            {!collapsed && <span className="whitespace-nowrap">Theme</span>}
+            <span className={`text-xs ${collapsed ? '' : 'ml-auto'}`}>{themes.find(t => t.id === theme)?.emoji}</span>
           </motion.button>
 
           <AnimatePresence>
@@ -131,9 +170,9 @@ export const Sidebar = () => {
         </div>
 
         {streak > 0 && (
-          <motion.div 
-            className="glass-card rounded-lg p-3 flex items-center gap-2"
-            animate={{ 
+          <motion.div
+            className="glass-card rounded-lg p-2.5 flex items-center gap-2"
+            animate={{
               boxShadow: [
                 '0 0 0 0 hsl(var(--accent) / 0)',
                 '0 0 20px 0 hsl(var(--accent) / 0.2)',
@@ -142,14 +181,112 @@ export const Sidebar = () => {
             }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            <Flame size={18} className="text-accent animate-pulse-glow" />
-            <div className="hidden md:block">
-              <p className="text-xs text-muted-foreground">Streak</p>
-              <p className="font-mono text-sm font-bold text-accent">{streak} days</p>
-            </div>
+            <Flame size={18} className="text-accent animate-pulse-glow shrink-0" />
+            {!collapsed && (
+              <div>
+                <p className="text-xs text-muted-foreground">Streak</p>
+                <p className="font-mono text-sm font-bold text-accent">{streak} days</p>
+              </div>
+            )}
           </motion.div>
         )}
       </div>
-    </div>
+    </motion.div>
+  );
+};
+
+// Mobile bottom navigation bar
+export const MobileBottomNav = () => {
+  const { activeTab, setActiveTab } = useTrackerStore();
+
+  // Show only 5 main tabs on mobile bottom nav for space
+  const mobileTabs = tabs.slice(0, 5);
+  const moreTabs = tabs.slice(5);
+  const [showMore, setShowMore] = useState(false);
+  const isMoreActive = moreTabs.some(t => t.id === activeTab);
+
+  return (
+    <>
+      {/* More menu overlay */}
+      <AnimatePresence>
+        {showMore && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm md:hidden"
+            onClick={() => setShowMore(false)}
+          >
+            <motion.div
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 100, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="absolute bottom-16 left-4 right-4 glass-card rounded-xl p-3 grid grid-cols-3 gap-2"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {moreTabs.map((tab) => (
+                <motion.button
+                  key={tab.id}
+                  onClick={() => { setActiveTab(tab.id); setShowMore(false); }}
+                  whileTap={{ scale: 0.9 }}
+                  className={`flex flex-col items-center gap-1.5 py-3 rounded-lg text-xs transition-colors ${
+                    activeTab === tab.id
+                      ? 'text-primary bg-primary/10'
+                      : 'text-muted-foreground hover:bg-muted/50'
+                  }`}
+                >
+                  {tab.icon}
+                  <span>{tab.label}</span>
+                </motion.button>
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Bottom nav bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-sidebar/95 backdrop-blur-xl border-t border-sidebar-border safe-area-bottom">
+        <div className="flex items-center justify-around px-1 h-14">
+          {mobileTabs.map((tab) => (
+            <motion.button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              whileTap={{ scale: 0.85 }}
+              className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors min-w-[48px] ${
+                activeTab === tab.id
+                  ? 'text-primary'
+                  : 'text-muted-foreground'
+              }`}
+            >
+              {activeTab === tab.id && (
+                <motion.div
+                  layoutId="mobile-nav-active"
+                  className="absolute top-0 w-8 h-0.5 rounded-full bg-primary"
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                />
+              )}
+              <span className="relative">{tab.icon}</span>
+              <span className="text-[10px] leading-none">{tab.label}</span>
+            </motion.button>
+          ))}
+          {/* More button */}
+          <motion.button
+            onClick={() => setShowMore(!showMore)}
+            whileTap={{ scale: 0.85 }}
+            className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors min-w-[48px] ${
+              isMoreActive || showMore
+                ? 'text-primary'
+                : 'text-muted-foreground'
+            }`}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
+            </svg>
+            <span className="text-[10px] leading-none">More</span>
+          </motion.button>
+        </div>
+      </div>
+    </>
   );
 };
