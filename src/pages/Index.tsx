@@ -57,13 +57,13 @@ const Index = () => {
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.4 }}
-                className="h-14 border-b border-border flex items-center justify-between px-6 shrink-0"
+                className="h-12 md:h-14 border-b border-border flex items-center justify-between px-3 md:px-6 shrink-0"
               >
                 <div />
                 <DailyCheckIn />
               </motion.header>
               <ScrollArea className="flex-1">
-                <div className="p-6 max-w-4xl mx-auto">
+                <div className="p-3 md:p-6 max-w-4xl mx-auto">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activeTab}
