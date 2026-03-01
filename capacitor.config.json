@@ -1,0 +1,9 @@
+{
+  "appId": "app.lovable.ed1e1978e34745e7a8ecc6c3023315ee",
+  "appName": "progress-ace-hub",
+  "webDir": "dist",
+  "server": {
+    "url": "https://ed1e1978-e347-45e7-a8ec-c6c3023315ee.lovableproject.com?forceHideBadge=true",
+    "cleartext": true
+  }
+}
